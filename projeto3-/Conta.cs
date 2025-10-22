@@ -1,30 +1,30 @@
-public class ContaCorrente
+public class Conta
 {
     public string Numero { get; set; }
     public string Titular { get; set; }
 
-    private decimal Saldo;
+    private decimal _saldo;
 
-    public ContaCorrente()
+    public Conta()
     {
         this.Numero = "sem numeracao";
         this.Titular = "sem titular";
-        this.Saldo = 0;
+        this._saldo = 0;
     }
 
-    public ContaCorrente(string numero, string titular, decimal saldo)
+    public Conta(string numero, string titular, decimal saldo)
     {
 
         this.Numero = numero;
         this.Titular = titular;
-        this.Saldo = saldo;
+        this._saldo = saldo;
     }
 
     public Boolean Depositar(decimal valor)
     {
         if (valor > 0)
         {
-            this.Saldo += valor;
+            this._saldo += valor;
             return true;
         }
         else
@@ -37,9 +37,9 @@ public class ContaCorrente
 
     public Boolean Sacar(decimal valor)
     {
-        if (valor > 0 && this.Saldo >= valor)
+        if (valor > 0 && this._saldo >= valor)
         {
-            this.Saldo -= valor;
+            this._saldo -= valor;
             return true;
         }
 
@@ -48,7 +48,7 @@ public class ContaCorrente
 
     public decimal ObterSaldo()
     {
-        return this.Saldo;
+        return this._saldo;
     }
 
 }

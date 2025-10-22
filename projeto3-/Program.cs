@@ -2,7 +2,7 @@
 {
     public static void Main(string[] args)
     {
-        ContaCorrente conta = new ContaCorrente("12345-6", "João Silva", 1000.50m);
+        Conta conta = new Conta("12345-6", "João Silva", 1000.50m);
 
         System.Console.WriteLine("Número da Conta: " + conta.Numero);
         System.Console.WriteLine("Titular: " + conta.Titular);
@@ -21,7 +21,7 @@
 
 
 
-        ContaCorrente conta3 = new ContaCorrente();
+        Conta conta3 = new Conta();
 
         System.Console.WriteLine("Número da Conta: " + conta3.Numero);
         System.Console.WriteLine("Titular: " + conta3.Titular);
