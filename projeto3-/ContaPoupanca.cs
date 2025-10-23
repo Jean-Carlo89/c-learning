@@ -13,4 +13,9 @@ public class ContaPoupanca : Conta
         decimal juros = ObterSaldo() * TaxaJuros;
         Depositar(juros);
     }
+
+    public override decimal CalcularTarifa()
+    {
+        return 2.00m;
+    }
 }

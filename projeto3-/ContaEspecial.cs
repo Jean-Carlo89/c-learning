@@ -14,6 +14,37 @@ public class ContaEspecial : Conta
         Limite = 0;
     }
 
+    public override decimal CalcularTarifa()
+    {
+
+        const decimal tariffProportion = 0.01m;
+
+        decimal tarifaCalculada = this.Limite * tariffProportion;
 
 
+        return tarifaCalculada;
+    }
+
+    public override bool Sacar(decimal valor)
+    {
+        if (valor > 0 && (ObterSaldo() + Limite) >= valor)
+        {
+            decimal saldoAtual = ObterSaldo();
+            if (saldoAtual >= valor)
+            {
+                // *** sacar normalmente
+                return base.Sacar(valor);
+            }
+            else
+            {
+                // ** limite especial
+                decimal valorDoLimite = valor - saldoAtual;
+                base.Sacar(saldoAtual);
+                Limite -= valorDoLimite; // Reduz o limite especial
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

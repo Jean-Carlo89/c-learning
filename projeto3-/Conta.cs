@@ -12,7 +12,7 @@ public class Conta
         this._saldo = 0;
     }
 
-    public Conta(string numero, string titular, decimal saldo)
+    public Conta(string numero, string titular, decimal saldo = 0)
     {
 
         this.Numero = numero;
@@ -35,7 +35,7 @@ public class Conta
 
     }
 
-    public Boolean Sacar(decimal valor)
+    public virtual Boolean Sacar(decimal valor)
     {
         if (valor > 0 && this._saldo >= valor)
         {
@@ -49,6 +49,11 @@ public class Conta
     public decimal ObterSaldo()
     {
         return this._saldo;
+    }
+
+    public virtual decimal CalcularTarifa()
+    {
+        return 5.0m;
     }
 
 }
