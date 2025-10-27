@@ -45,6 +45,24 @@ public class Program
             Console.WriteLine($"Conta: Número: {conta.Numero}, Saldo: {conta.Saldo}, Tipo: {conta.Tipo}, Titular: {conta.Titular}");
         }
 
-        contasFixas[5] = new Conta(2000, 3000, "Poupança", "Fernanda");
+        // contasFixas[5] = new Conta(2000, 3000, "Poupança", "Fernanda");
+
+        Console.WriteLine("---- Dictionary ----");
+
+        Dictionary<int, Conta> contasDictionary = new Dictionary<int, Conta>();
+
+        contas.ForEach((conta) => { contasDictionary[conta.Numero] = conta; });
+
+        foreach (var keyPair in contasDictionary)
+        {
+
+            int numeroConta = keyPair.Key;
+
+
+            Conta conta = keyPair.Value;
+
+
+            Console.WriteLine($"Key:  {numeroConta}, Conta:{{ Saldo: {conta.Saldo}, Titular: {conta.Titular} }}");
+        }
     }
 }
