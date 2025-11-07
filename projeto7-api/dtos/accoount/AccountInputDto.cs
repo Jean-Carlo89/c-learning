@@ -11,7 +11,10 @@ public class AccountInputDto
     public string Titular { get; set; }
 
 
+
     [Required(ErrorMessage = "O tipo de conta é obrigatório.")]
-    public string Tipo { get; set; }
+
+    [EnumDataType(typeof(AccountType), ErrorMessage = "O tipo de conta é inválido. Valores permitidos: {0}")]
+    public AccountType Tipo { get; set; }
 
 }

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,7 +10,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var accountInMemoryRepo = new List<Account>();
+builder.Services.AddDbContext<BankContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
+//** 
+
+
+
+var accountInMemoryRepo = new List<Conta>();
 builder.Services.AddSingleton(accountInMemoryRepo);
 var app = builder.Build();
 
@@ -43,6 +51,48 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 app.MapControllers();
+
+app.MapGet("/health", async (BankContext context) =>
+{
+
+    // try
+    // {
+    //     // Verifica se o banco de dados pode ser acessado
+    //     var canConnect = await context.Database.CanConnectAsync();
+    //     if (canConnect)
+    //     {
+
+    //         Console.WriteLine("Banco de dados acessível");
+
+    //         return Results.Ok("Healthy");
+    //     }
+    //     else
+    //     {
+    //         return Results.StatusCode(503); // Serviço Indisponível
+    //     }
+    // }
+    // catch (Exception ex)
+    // {
+    //     return Results.Problem($"Erro ao conectar ao banco de dados.  {ex.Message}");
+    // }
+
+    try
+    {
+        bool canConnect = await context.Database.CanConnectAsync();
+        if (canConnect)
+        {
+            return Results.Ok("O banco está funcionando.");
+        }
+        else
+        {
+            return Results.Problem("Não foi possível conectar ao banco de dados.");
+        }
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Meu banco falhou: {ex.Message}");
+    }
+});
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
