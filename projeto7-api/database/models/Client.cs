@@ -7,5 +7,5 @@ public class Client
     public string Email { get; set; }
     public DateTime DateOfBirth { get; set; }
 
-    public List<BankAccount> Accounts { get; set; }
+    public List<BankAccountModel> Accounts { get; set; }
 }

@@ -16,8 +16,8 @@ builder.Services.AddDbContext<BankContext>(options =>
 
 
 
-var accountInMemoryRepo = new List<Conta>();
-builder.Services.AddSingleton(accountInMemoryRepo);
+//var accountInMemoryRepo = new List<Conta>();
+//builder.Services.AddSingleton(accountInMemoryRepo);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

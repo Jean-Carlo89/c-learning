@@ -7,19 +7,20 @@ public class BankContext : DbContext
     {
     }
 
-    public DbSet<BankAccount> Accounts { get; set; }
+    public DbSet<BankAccountModel> Accounts { get; set; }
 
     public DbSet<Client> Clients { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<BankAccount>()
+        modelBuilder.Entity<BankAccountModel>()
                     .HasKey(a => a.Id);
 
-        modelBuilder.Entity<BankAccount>(entity =>
+        modelBuilder.Entity<BankAccountModel>(entity =>
         {
             entity.HasKey(a => a.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Number).IsRequired().HasMaxLength(20);
             entity.Property(e => e.Balance).IsRequired().HasColumnType("decimal(18,2)");
             entity.Property(e => e.CreatedAt).IsRequired();

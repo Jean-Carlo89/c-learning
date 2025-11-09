@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem.API.model;
 
-public class BankAccount
+public class BankAccountModel
 
 
 {
 
 
-    public BankAccount() { }
+    public BankAccountModel() { }
 
-    public BankAccount(int Number, decimal Balance, AccountType Type, string Holder)
+    public BankAccountModel(int Number, decimal Balance, AccountType Type, string Holder)
     {
         this.Number = Number;
         this.Balance = Balance;

@@ -11,7 +11,7 @@ namespace projeto7_api.Controllers
     public class AccountsController(BankContext context) : ControllerBase
     {
         //** metodo antigo
-        private readonly List<Conta> _accounts;
+        // private readonly List<Conta> _accounts;
 
         int _count = 0;
         // private BankContext _context;
@@ -20,33 +20,37 @@ namespace projeto7_api.Controllers
         //     _accounts = accounts;
         //     // _context = context;
         // }
-        [HttpGet]
-        public IActionResult GetContas()
-        {
+        // [HttpGet]
+        // public IActionResult GetContas()
+        // {
 
 
-            var contasDTO = this._accounts
-              .Select(conta => new AccountOutputDto
-              {
-                  Numero = conta.Numero,
-                  Saldo = conta.Saldo,
-                  Titular = conta.Titular,
-                  Tipo = conta.Tipo
+        //     var contasDTO = this._accounts
+        //       .Select(conta => new AccountOutputDto
+        //       {
+        //           Numero = conta.Numero,
+        //           Saldo = conta.Saldo,
+        //           Titular = conta.Titular,
+        //           Tipo = conta.Tipo
 
-              })
-              .ToList();
+        //       })
+        //       .ToList();
 
 
-            return Ok(contasDTO);
+        //     return Ok(contasDTO);
 
-        }
+        // }
 
         [HttpGet("{numero}")]
         public async Task<IActionResult> GetContasByNumber(int numero)
         {
 
-            var account = await context.Accounts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Id == numero);
+            var accountModel = await context.Accounts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Number == numero);
 
+            BankAccount accountEntity = BankAccountModelMapper.ToEntity(accountModel);
+
+
+            AccountOutputDto account = BankAccountModelMapper.ToOutputDto(accountEntity);
 
             if (account == null)
             {
@@ -63,21 +67,28 @@ namespace projeto7_api.Controllers
         public async Task<IActionResult> CreateConta([FromBody] AccountInputDto AccountDto)
         {
 
-            _count++;
+            this._count = _count + 1;
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
 
-            BankAccount newAccount = new BankAccount(_count, AccountDto.Saldo, AccountDto.Tipo, AccountDto.Titular);
+            Random random = new Random();
+            int maxExclusive = 1000000;
+            int randomNumber = random.Next(0, maxExclusive);
 
-            await context.AddAsync(newAccount);
+            BankAccount newAccount = new BankAccount(AccountDto, randomNumber, 1);
 
-            //!!  lembrar de adicionar a valdiacao
+            BankAccountModel accountModel = BankAccountModelMapper.ToModel(newAccount);
+
+
+            await context.AddAsync(accountModel);
+
+
             await context.SaveChangesAsync();
 
-            //  return CreatedAtAction(nameof(GetContasByNumber), new { newAccount.Number }, AccountDto);
+
 
             return CreatedAtAction(
                     nameof(GetContasByNumber),
@@ -100,13 +111,22 @@ namespace projeto7_api.Controllers
             }
 
 
-            var conta = await context.Accounts.FirstOrDefaultAsync(c => c.Id == numero);
+            var conta = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
 
             if (conta == null)
             {
                 return NotFound($"Conta com o número {numero} não encontrada.");
             }
 
+
+            BankAccount accountEntity = BankAccountModelMapper.ToEntity(conta);
+
+
+
+
+            accountEntity.Deposit(depositeDto.Valor);
+
+            // conta = BankAccountModelMapper.ToModel(accountEntity);
 
 
 
@@ -123,7 +143,7 @@ namespace projeto7_api.Controllers
         public async Task<IActionResult> DeleteConta(int numero)
         {
 
-            var accountToDelete = await context.Accounts.FirstOrDefaultAsync(c => c.Id == numero);
+            var accountToDelete = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
 
 
             if (accountToDelete == null)
