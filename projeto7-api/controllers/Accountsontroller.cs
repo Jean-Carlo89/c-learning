@@ -74,11 +74,18 @@ namespace projeto7_api.Controllers
             }
 
 
+            var clientExists = await context.Clients.AnyAsync(c => c.Id == AccountDto.ClientId);
+            if (!clientExists)
+            {
+                return NotFound($"Cliente com Id {AccountDto.ClientId} não encontrado.");
+            }
+
+
             Random random = new Random();
             int maxExclusive = 1000000;
             int randomNumber = random.Next(0, maxExclusive);
 
-            BankAccount newAccount = new BankAccount(AccountDto, randomNumber, 1);
+            BankAccount newAccount = new BankAccount(AccountDto, randomNumber, AccountDto.ClientId);
 
             BankAccountModel accountModel = BankAccountModelMapper.ToModel(newAccount);
 

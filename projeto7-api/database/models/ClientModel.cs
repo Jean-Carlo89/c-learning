@@ -1,11 +1,13 @@
 using BankSystem.API.model;
 
-public class Client
+public class ClientModel
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
+
     public DateTime DateOfBirth { get; set; }
+
 
     public List<BankAccountModel> Accounts { get; set; }
 }

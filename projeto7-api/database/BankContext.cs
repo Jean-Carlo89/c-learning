@@ -9,7 +9,7 @@ public class BankContext : DbContext
 
     public DbSet<BankAccountModel> Accounts { get; set; }
 
-    public DbSet<Client> Clients { get; set; }
+    public DbSet<ClientModel> Clients { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,11 +30,11 @@ public class BankContext : DbContext
             entity.HasOne(c => c.Client)
                   .WithMany(a => a.Accounts)
                   .HasForeignKey(c => c.ClientId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
         });
 
-        modelBuilder.Entity<Client>()
+        modelBuilder.Entity<ClientModel>()
                     .HasKey(c => c.Id);
     }
 }

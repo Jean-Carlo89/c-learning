@@ -10,7 +10,8 @@ public class AccountInputDto
     [Required(ErrorMessage = "O nome do titular é obrigatório.")]
     public string Titular { get; set; }
 
-
+    [Required(ErrorMessage = "O ID do cliente é obrigatório.")]
+    public int ClientId { get; set; }
 
     [Required(ErrorMessage = "O tipo de conta é obrigatório.")]
 
