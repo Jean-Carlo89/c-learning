@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using BankSystem.API.model;
+using BankSystem.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,12 +9,19 @@ namespace projeto7_api.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountsController(BankContext context) : ControllerBase
+    public class AccountsController : ControllerBase
     {
+
+        //(BankContext context)
         //** metodo antigo
         // private readonly List<Conta> _accounts;
-
+        private readonly IAccountRepository _repository;
         int _count = 0;
+
+        public AccountsController(IAccountRepository repository)
+        {
+            _repository = repository;
+        }
         // private BankContext _context;
         // public AccountsController(List<Account> accounts, BankContext context)
         // {
@@ -45,7 +53,10 @@ namespace projeto7_api.Controllers
         public async Task<IActionResult> GetContasByNumber(int numero)
         {
 
-            var accountModel = await context.Accounts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Number == numero);
+            // var accountModel = await context.Accounts.Include(c => c.Client).FirstOrDefaultAsync(c => c.Number == numero);
+
+            var accountModel = await this._repository.GetByNumberAsync(numero);
+
 
             BankAccount accountEntity = BankAccountModelMapper.ToEntity(accountModel);
 
@@ -74,7 +85,9 @@ namespace projeto7_api.Controllers
             }
 
 
-            var clientExists = await context.Clients.AnyAsync(c => c.Id == AccountDto.ClientId);
+            // var clientExists = await context.Clients.AnyAsync(c => c.Id == AccountDto.ClientId);
+
+            var clientExists = await this._repository.ClientExistsAsync(AccountDto.ClientId);
             if (!clientExists)
             {
                 return NotFound($"Cliente com Id {AccountDto.ClientId} não encontrado.");
@@ -89,11 +102,12 @@ namespace projeto7_api.Controllers
 
             BankAccountModel accountModel = BankAccountModelMapper.ToModel(newAccount);
 
+            await this._repository.AddAsync(accountModel);
+            await this._repository.SaveChangesAsync();
+            // await context.AddAsync(accountModel);
 
-            await context.AddAsync(accountModel);
 
-
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
 
 
 
@@ -118,7 +132,8 @@ namespace projeto7_api.Controllers
             }
 
 
-            var conta = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
+            // var conta = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
+            BankAccountModel conta = await this._repository.GetByNumberAsync(numero);
 
             if (conta == null)
             {
@@ -137,21 +152,69 @@ namespace projeto7_api.Controllers
 
 
 
-            conta.Balance += depositeDto.Valor;
+            conta.Balance = accountEntity.Balance;
 
 
-            await context.SaveChangesAsync();
+            // await context.SaveChangesAsync();
+
+            await this._repository.SaveChangesAsync();
 
 
-            return Ok(conta);
+            return Ok();
+        }
+
+        [HttpPut("{numero}/withdraw")]
+        public async Task<IActionResult> Withdraw(int numero, [FromBody] WithdrawInputDto withdrawDto)
+        {
+
+            if (!ModelState.IsValid || withdrawDto.Valor <= 0)
+            {
+                return BadRequest("O valor do saque deve ser positivo.");
+            }
+
+
+            // var conta = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
+            var conta = await this._repository.GetByNumberAsync(numero);
+
+            if (conta == null)
+            {
+                return NotFound($"Conta com o número {numero} não encontrada.");
+            }
+
+
+            BankAccount accountEntity = BankAccountModelMapper.ToEntity(conta);
+
+            try
+            {
+
+                accountEntity.Withdraw(withdrawDto.Valor);
+
+
+                conta.Balance = accountEntity.Balance;
+
+
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+
+            // await context.SaveChangesAsync();
+            await this._repository.SaveChangesAsync();
+
+
+            return Ok();
         }
 
         [HttpDelete("{numero}")]
         public async Task<IActionResult> DeleteConta(int numero)
         {
 
-            var accountToDelete = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
+            //  var accountToDelete = await context.Accounts.FirstOrDefaultAsync(c => c.Number == numero);
 
+            var accountToDelete = await this._repository.GetByNumberAsync(numero);
 
             if (accountToDelete == null)
             {
@@ -159,8 +222,10 @@ namespace projeto7_api.Controllers
             }
 
 
-            context.Accounts.Remove(accountToDelete);
-            await context.SaveChangesAsync();
+            // context.Accounts.Remove(accountToDelete);
+            // await context.SaveChangesAsync();
+            await this._repository.DeleteAsync(accountToDelete);
+            await this._repository.SaveChangesAsync();
 
 
             return NoContent();

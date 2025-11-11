@@ -34,7 +34,30 @@ public class BankContext : DbContext
 
         });
 
-        modelBuilder.Entity<ClientModel>()
-                    .HasKey(c => c.Id);
+        modelBuilder.Entity<ClientModel>((entity) =>
+        {
+
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Id).ValueGeneratedOnAdd();
+
+
+            entity.Property(c => c.Name).IsRequired().HasMaxLength(150);
+
+
+            entity.Property(c => c.Email).IsRequired().HasMaxLength(100);
+            entity.HasIndex(c => c.Email).IsUnique();
+
+
+            entity.Property(c => c.Cpf).IsRequired().HasMaxLength(11);
+            entity.HasIndex(c => c.Cpf).IsUnique();
+
+
+            entity.Property(c => c.DateOfBirth).IsRequired();
+        });
+
+
+
     }
 }
+
+

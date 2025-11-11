@@ -7,8 +7,8 @@ namespace BankSystem.API.Dtos
 
         public int Id { get; set; }
 
-        // Nome completo
-        public string Name { get; set; }
+
+        public string Nome { get; set; }
 
 
         public string Email { get; set; }
@@ -18,7 +18,7 @@ namespace BankSystem.API.Dtos
 
         public DateTime DateOfBirth { get; set; }
 
-        public List<AccountOutputDto> Accounts { get; set; }
+        public List<AccountOutputDto> Contas { get; set; }
 
 
     }

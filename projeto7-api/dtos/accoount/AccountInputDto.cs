@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations;
 public class AccountInputDto
 
 {
+
+
+
     [Range(0, 1000000, ErrorMessage = "O saldo inicial deve ser positivo.")]
     public decimal Saldo { get; set; }
 

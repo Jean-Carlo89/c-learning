@@ -48,9 +48,10 @@ public static class ClientModelMapper
         );
 
 
-        // entity.Accounts = model.Accounts?
-        //                        .Select(BankAccountModelMapper.ToEntity)
-        //                        .ToList();
+        // entity.Accounts = model.Accounts.ForEach(account => { BankAccountModelMapper.ToEntity(account); });
+        entity.Accounts = model.Accounts?
+                               .Select(account => BankAccountModelMapper.ToEntity(account))
+                               .ToList();
 
         return entity;
     }
@@ -66,10 +67,10 @@ public static class ClientModelMapper
         return new ClientOutputDto
         {
             Id = entity.Id,
-            Name = entity.Name,
+            Nome = entity.Name,
             Email = entity.Email,
             DOB = entity.DateOfBirth,
-            Accounts = entity.Accounts?
+            Contas = entity.Accounts?
                          .Select(BankAccountModelMapper.ToOutputDto)
                          .ToList()
 

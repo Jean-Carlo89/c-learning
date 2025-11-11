@@ -1,3 +1,4 @@
+using BankSystem.API.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +15,7 @@ builder.Services.AddDbContext<BankContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
 //** 
 
-
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 //var accountInMemoryRepo = new List<Conta>();
 //builder.Services.AddSingleton(accountInMemoryRepo);
