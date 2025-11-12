@@ -13,9 +13,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BankContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BankDatabase")));
-//** 
 
+//** 
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
 //var accountInMemoryRepo = new List<Conta>();
 //builder.Services.AddSingleton(accountInMemoryRepo);

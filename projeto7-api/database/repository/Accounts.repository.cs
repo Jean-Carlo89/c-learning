@@ -14,7 +14,7 @@ namespace BankSystem.API.Repositories
             _context = context;
         }
 
-        public async Task<BankAccountModel> GetByNumberAsync(int numero)
+        public async Task<BankAccountModel> GetAccountByNumberAsync(int numero)
         {
 
             return await _context.Accounts
@@ -22,30 +22,30 @@ namespace BankSystem.API.Repositories
                                  .FirstOrDefaultAsync(c => c.Number == numero);
         }
 
-        public async Task<bool> ClientExistsAsync(int clientId)
+        public async Task<bool> checkIfClientExistsByIdAsync(int clientId)
         {
             return await _context.Clients.AnyAsync(c => c.Id == clientId);
         }
 
-        public async Task AddAsync(BankAccountModel account)
+        public async Task AddNewAccountAsync(BankAccountModel account)
         {
             await _context.Accounts.AddAsync(account);
         }
 
-        public Task UpdateAsync(BankAccountModel account)
+        public Task UpdateAccountAsync(BankAccountModel account)
         {
 
             _context.Accounts.Update(account);
             return Task.CompletedTask;
         }
 
-        public Task DeleteAsync(BankAccountModel account)
+        public Task DeleteAccountAsync(BankAccountModel account)
         {
             _context.Accounts.Remove(account);
             return Task.CompletedTask;
         }
 
-        public async Task SaveChangesAsync()
+        public async Task SaveDatabaseChangesAsync()
         {
             await _context.SaveChangesAsync();
         }

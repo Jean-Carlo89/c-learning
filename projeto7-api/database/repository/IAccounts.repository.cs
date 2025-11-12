@@ -6,11 +6,11 @@ namespace BankSystem.API.Repositories
 {
     public interface IAccountRepository
     {
-        Task<BankAccountModel> GetByNumberAsync(int numero);
-        Task<bool> ClientExistsAsync(int clientId);
-        Task AddAsync(BankAccountModel account);
-        Task UpdateAsync(BankAccountModel account);
-        Task DeleteAsync(BankAccountModel account);
-        Task SaveChangesAsync();
+        Task<BankAccountModel> GetAccountByNumberAsync(int numero);
+        Task<bool> checkIfClientExistsByIdAsync(int clientId);
+        Task AddNewAccountAsync(BankAccountModel account);
+        Task UpdateAccountAsync(BankAccountModel account);
+        Task DeleteAccountAsync(BankAccountModel account);
+        Task SaveDatabaseChangesAsync();
     }
 }
