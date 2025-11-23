@@ -16,7 +16,7 @@ namespace BankSystem.Domain.Entities
         public int Id { get; private set; }
         public TransactionType Type { get; private set; }
         public decimal Value { get; private set; }
-        public DateTime TransactionTime { get; private set; }
+        public DateTime CreatedAt { get; private set; }
 
 
         public int? SourceAccountId { get; private set; }
@@ -32,7 +32,7 @@ namespace BankSystem.Domain.Entities
 
             this.Type = type;
             this.Value = value;
-            this.TransactionTime = DateTime.UtcNow;
+            this.CreatedAt = DateTime.UtcNow;
 
             if (type == TransactionType.Deposit)
             {
@@ -56,7 +56,7 @@ namespace BankSystem.Domain.Entities
 
             this.Type = TransactionType.Transfer;
             this.Value = value;
-            this.TransactionTime = DateTime.UtcNow;
+            this.CreatedAt = DateTime.UtcNow;
             this.SourceAccountId = sourceAccountId;
             this.DestinationAccountId = destinationAccountId;
         }

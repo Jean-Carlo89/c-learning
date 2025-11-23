@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BankSystem.API.model;
 using BankSystem.API.Repositories;
+using BankSystem.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +19,16 @@ namespace projeto7_api.Controllers
     {
 
         private readonly IAccountService _accountService;
+
+        private ITransferService _transferService;
         private readonly IConfiguration _configuration;
 
 
-        public AccountsController(IAccountService accountService)
+        public AccountsController(IAccountService accountService, ITransferService transferService, IConfiguration configuration)
         {
             _accountService = accountService;
-
+            _transferService = transferService;
+            _configuration = configuration;
         }
 
         private string GenerateJwtToken(string username)
@@ -177,6 +181,7 @@ namespace projeto7_api.Controllers
         public async Task<IActionResult> Transfer([FromBody] TransferInputDto transferDto)
         {
             // 1. Validação de modelo e valor
+            Console.WriteLine("Entrou no controller de transferência");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -192,9 +197,8 @@ namespace projeto7_api.Controllers
 
             try
             {
-                // 2. Chamada ao Serviço para processar a transferência (que deve incluir:
-                //    verificação de existência das contas, saldo e criação da transação).
-                await _accountService.TransferBetweenAccountsAsync(
+
+                await _transferService.ExecuteTransferAsync(
                     transferDto.SourceAccountNumber,
                     transferDto.DestinationAccountNumber,
                     transferDto.Valor
@@ -204,17 +208,17 @@ namespace projeto7_api.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                // Captura erros de saldo insuficiente, conta inativa, etc.
+
                 return BadRequest(ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
-                // Assumindo que o Service lança KeyNotFoundException se a conta não existir
+
                 return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                // Logar o erro (ex)
+
                 return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
             }
         }

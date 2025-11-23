@@ -3,6 +3,7 @@ using BankSystem.API.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BankSystem.API.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -51,6 +52,11 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+
+builder.Services.AddScoped<ITransferService, TransferService>();
 
 builder.Services.AddAuthorization();
 

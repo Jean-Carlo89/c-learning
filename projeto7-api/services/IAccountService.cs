@@ -17,5 +17,5 @@ public interface IAccountService
     Task<bool> checkIfAccountExistsByNumberAsync(int accountNumber);
 
     Task deleteAccountAsync(int accountNumber);
-    Task TransferBetweenAccountsAsync(int sourceAccountNumber, int destinationAccountNumber, decimal amount);
+    // Task TransferBetweenAccountsAsync(int sourceAccountNumber, int destinationAccountNumber, decimal amount);
 }
