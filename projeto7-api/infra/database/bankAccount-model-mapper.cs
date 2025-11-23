@@ -1,3 +1,4 @@
+using BankSystem.API.Mappers;
 using BankSystem.API.model;
 public static class BankAccountModelMapper
 {
@@ -10,6 +11,7 @@ public static class BankAccountModelMapper
             return null;
         }
 
+
         return new BankAccountModel
         {
 
@@ -21,6 +23,7 @@ public static class BankAccountModelMapper
             Type = entity.Type,
             Status = entity.Status,
             ClientId = entity.ClientId,
+            Transactions = TransactionMapper.ToModelList(entity.Transactions.ToList()),
 
         };
     }
@@ -53,12 +56,37 @@ public static class BankAccountModelMapper
             createdAt: model.CreatedAt,
             status: model.Status,
             clientId: model.ClientId
+        // transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
         );
 
 
     }
 
-    public static List<BankAccount> ToEntity(List<BankAccountModel> models)
+
+    public static BankAccount ToEntityWithTransactions(BankAccountModel model)
+    {
+        if (model == null)
+        {
+            return null;
+        }
+
+        var mappedAccount = new BankAccount(
+                    id: model.Id,
+                    number: model.Number,
+                    balance: model.Balance,
+                    type: model.Type,
+                    holder: model.Holder,
+                    createdAt: model.CreatedAt,
+                    status: model.Status,
+                    clientId: model.ClientId,
+                    transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
+                );
+        return mappedAccount;
+
+
+    }
+
+    public static List<BankAccount> ToEntityList(List<BankAccountModel> models)
     {
 
         if (models == null)
@@ -77,6 +105,7 @@ public static class BankAccountModelMapper
                 createdAt: model.CreatedAt,
                 status: model.Status,
                 clientId: model.ClientId
+            // , transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
             ))
             .ToList();
     }
@@ -100,6 +129,8 @@ public static class BankAccountModelMapper
         };
     }
 
+
+
     public static List<AccountOutputDto> ToOutputDto(List<BankAccount> entities)
     {
         if (entities == null)
@@ -109,5 +140,20 @@ public static class BankAccountModelMapper
 
 
         return entities.Select(ToOutputDto).ToList();
+    }
+
+    public static AccountOutputWithTransactionsDto ToOutputWithTransactionsDto(BankAccount entity)
+    {
+
+        if (entity == null)
+        {
+            return null;
+        }
+
+        return new AccountOutputWithTransactionsDto
+        {
+            DetalhesDaConta = ToOutputDto(entity),
+            Transacoes = TransactionMapper.ToOutputDtoList(entity.Transactions.ToList())
+        };
     }
 }

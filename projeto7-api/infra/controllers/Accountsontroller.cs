@@ -33,14 +33,14 @@ namespace projeto7_api.Controllers
 
         private string GenerateJwtToken(string username)
         {
-            // Obtém as configurações do appsettings.json
+
             var jwtKey = _configuration["JwtSettings:Key"];
             var issuer = _configuration["JwtSettings:Issuer"];
             var audience = _configuration["JwtSettings:Audience"];
 
             var key = Encoding.ASCII.GetBytes(jwtKey);
 
-            // Claims (Declarações) que serão inseridas no Payload do token
+
             var claims = new[]
             {
             new Claim(ClaimTypes.Name, username),
@@ -51,7 +51,7 @@ namespace projeto7_api.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddHours(1), // O token expira em 1 hora
+                Expires = DateTime.UtcNow.AddHours(1),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(
@@ -67,15 +67,30 @@ namespace projeto7_api.Controllers
         }
 
 
-        [HttpGet("{numero}")]
-        public async Task<IActionResult> GetAccountByNumber(int numero)
+        [HttpGet("{accountNumber}")]
+        public async Task<IActionResult> GetAccountByNumber(int accountNumber)
         {
-            var account = await this._accountService.GetAccountByNumberAsync(numero);
+            var account = await this._accountService.GetAccountByNumberAsync(accountNumber);
 
 
             if (account == null)
             {
-                return NotFound($"Conta com o número {numero} não encontrada.");
+                return NotFound($"Conta com o número {accountNumber} não encontrada.");
+            }
+
+
+            return Ok(account);
+        }
+
+        [HttpGet("{accountNumber}/history")]
+        public async Task<IActionResult> GetAccountHistory(int accountNumber)
+        {
+            var account = await this._accountService.GetAccountWithTransactionsByNumberAsync(accountNumber);
+
+
+            if (account == null)
+            {
+                return NotFound($"Conta com o número {accountNumber} não encontrada.");
             }
 
 
@@ -83,7 +98,7 @@ namespace projeto7_api.Controllers
         }
 
         [HttpGet]
-        //   [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> GetAllAccountsAsync(int numero)
         {
             var account = await this._accountService.GetAllAccountsAsync();
@@ -102,7 +117,7 @@ namespace projeto7_api.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateConta([FromBody] AccountInputDto AccountDto)
+        public async Task<IActionResult> CreateAccount([FromBody] AccountInputDto AccountDto)
         {
 
             if (!ModelState.IsValid)
@@ -111,13 +126,14 @@ namespace projeto7_api.Controllers
             }
 
             var clientExists = await this._accountService.checkIfClientExistsByIdAsync(AccountDto.ClientId);
+
             if (!clientExists)
             {
                 return NotFound($"Cliente com Id {AccountDto.ClientId} não encontrado.");
             }
 
             await this._accountService.AddNewAccountAsync(AccountDto);
-            //     Boolean accountCreated = 
+
             return Ok();
         }
 
@@ -180,7 +196,7 @@ namespace projeto7_api.Controllers
         [HttpPut("transfer")]
         public async Task<IActionResult> Transfer([FromBody] TransferInputDto transferDto)
         {
-            // 1. Validação de modelo e valor
+
             Console.WriteLine("Entrou no controller de transferência");
             if (!ModelState.IsValid)
             {

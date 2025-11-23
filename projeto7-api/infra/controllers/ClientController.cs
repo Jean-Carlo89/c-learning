@@ -53,12 +53,22 @@ public class ClientController : ControllerBase
 
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("/id/{id}")]
     public async Task<ActionResult<ClientOutputDto>> GetClient(int id)
     {
 
 
         var clientDSto = await service.GetClientByIdAsync(id);
+
+        return Ok(clientDSto);
+    }
+
+    [HttpGet("/cpf/{cpf}")]
+    public async Task<ActionResult<ClientOutputDto>> GetClientByCpf(string cpf)
+    {
+
+
+        var clientDSto = await service.GetClientByCpfAsync(cpf);
 
         return Ok(clientDSto);
     }

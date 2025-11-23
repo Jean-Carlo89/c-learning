@@ -27,6 +27,22 @@ public class ClientService : IClientService
         return clientDto;
     }
 
+    public async Task<ClientOutputDto> GetClientByCpfAsync(string cpf)
+    {
+        var clientModel = await this.repository.GetClientByCpfAsync(cpf);
+
+        if (clientModel == null)
+        {
+            return null;
+        }
+
+        var clientEntity = ClientModelMapper.ToEntity(clientModel);
+
+        var clientDto = ClientModelMapper.ToOutputDto(clientEntity);
+
+        return clientDto;
+    }
+
     private async Task<List<string>> CanCreateAccount(ClientInputDto client)
     {
 
@@ -85,4 +101,6 @@ public class ClientService : IClientService
         await this.repository.SaveDatabaseChangesAsync();
         return clientDto;
     }
+
+
 }

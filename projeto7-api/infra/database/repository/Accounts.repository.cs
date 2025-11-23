@@ -55,11 +55,33 @@ namespace BankSystem.API.Repositories
 
             return this._context.Accounts.ToListAsync();
         }
+
+        public async Task<BankAccountModel?> GetAccountByNumberWithTransactionsAsync(int number)
+        {
+
+
+            var account = await _context.Accounts
+                .Include(c => c.Client)
+                .FirstOrDefaultAsync(c => c.Number == number);
+
+            if (account == null)
+            {
+                return null;
+            }
+
+
+            var transactions = await _context.Transactions
+                .Where(t => t.SourceAccountId == account.Id)
+                .Include(t => t.SourceAccount)
+                .Include(t => t.DestinationAccount)
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
+
+
+            account.Transactions = transactions;
+
+            return account;
+        }
     }
 }
 
-// "JwtSettings": {
-//     "Key": "Sua-Chave-Super-Secreta-De-Pelo-Menos-32-Caracteres",
-//     "Issuer": "MinhaAPI",
-//     "Audience": "MinhaAPI"
-//   },

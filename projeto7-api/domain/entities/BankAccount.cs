@@ -1,8 +1,9 @@
-// Exemplo: Localizada em BankSystem.Domain.Entities
+
 
 using System;
 using System.Collections.Generic;
-using System.Transactions;
+using BankSystem.Domain.Entities;
+
 
 public class BankAccount
 {
@@ -16,9 +17,28 @@ public class BankAccount
     public DateTime CreatedAt { get; private set; }
     public int ClientId { get; private set; }
 
-    private readonly List<Transaction> _transactions = new List<Transaction>();
-    public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
+    public List<Transaction> Transactions { get; private set; }
 
+
+
+
+    public BankAccount(int id, int number, decimal balance, AccountType type, string holder, DateTime createdAt, AccountStatus status, int clientId, List<Transaction> transactions)
+    {
+
+        this.Id = id;
+        this.Number = number;
+        this.Balance = balance;
+        this.Type = type;
+        this.Holder = holder;
+        this.CreatedAt = createdAt;
+        this.Status = status;
+        this.ClientId = clientId;
+        this.Balance = Balance;
+        this.CreatedAt = createdAt != default(DateTime) ? createdAt : DateTime.Now;
+        this.Status = AccountStatus.Active;
+        this.Transactions = transactions;
+
+    }
 
     public BankAccount(int id, int number, decimal balance, AccountType type, string holder, DateTime createdAt, AccountStatus status, int clientId)
     {
@@ -35,7 +55,9 @@ public class BankAccount
         this.CreatedAt = createdAt != default(DateTime) ? createdAt : DateTime.Now;
         this.Status = AccountStatus.Active;
 
+
     }
+
 
 
     public BankAccount(AccountInputDto dto, int Number, int clientId)

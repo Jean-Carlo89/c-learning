@@ -6,6 +6,8 @@ public interface IClientService
 
     Task<ClientOutputDto> GetClientByIdAsync(int clientId);
 
+    Task<ClientOutputDto> GetClientByCpfAsync(string cpf);
+
     Task<ClientOutputDto> AddNewClientAsync(ClientInputDto client);
 
 

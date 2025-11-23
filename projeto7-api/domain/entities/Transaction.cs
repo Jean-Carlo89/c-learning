@@ -1,22 +1,16 @@
 using System;
 using System.Collections.Generic;
+using BankSystem.API.model;
 
 namespace BankSystem.Domain.Entities
 {
 
-    public enum TransactionType
-    {
-        Deposit,
-        Withdrawal,
-        TransferOut,
-        TransferIn
-    }
 
     public class Transaction
     {
         public int Id { get; private set; }
         public TransactionType Type { get; private set; }
-        public decimal Value { get; private set; }
+        public decimal Amount { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
 
@@ -36,10 +30,22 @@ namespace BankSystem.Domain.Entities
             }
 
             this.Type = type;
-            this.Value = value;
+            this.Amount = value;
             this.CreatedAt = DateTime.UtcNow;
             this.SourceAccountId = sourceAccountId;
             this.DestinationAccountId = destinationAccountId;
+        }
+
+        public Transaction(TransactionModel model)
+        {
+
+
+            this.Type = model.Type;
+            this.Amount = model.Amount;
+            this.Id = model.Id;
+            this.CreatedAt = model.CreatedAt;
+            this.SourceAccountId = model.SourceAccountId;
+            this.DestinationAccountId = model.DestinationAccountId;
         }
 
     }

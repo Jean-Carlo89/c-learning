@@ -5,6 +5,8 @@ public interface IAccountService
 
     Task<AccountOutputDto> GetAccountByNumberAsync(int accountNumber);
 
+    Task<AccountOutputWithTransactionsDto> GetAccountWithTransactionsByNumberAsync(int accountNumber);
+
     Task AddNewAccountAsync(AccountInputDto account);
 
     Task<List<BankAccount>> GetAllAccountsAsync();

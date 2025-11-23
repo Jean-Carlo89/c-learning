@@ -21,7 +21,7 @@ public class AccountService : IAccountService
     {
 
         Random random = new Random();
-        int maxExclusive = 1000000;
+        int maxExclusive = 10000000;
         int randomNumber = random.Next(0, maxExclusive);
 
         BankAccount newAccount = new BankAccount(accountDto, randomNumber, accountDto.ClientId);
@@ -51,13 +51,18 @@ public class AccountService : IAccountService
 
 
 
+    private async Task<BankAccountModel> PrivateGetAccountByNumberAsync(int accountNumber)
+    {
+        var accountModel = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
+        return accountModel;
 
+    }
 
 
 
     public async Task<AccountOutputDto> GetAccountByNumberAsync(int accountNumber)
     {
-        var accountModel = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
+        var accountModel = await this.PrivateGetAccountByNumberAsync(accountNumber);
 
         if (accountModel == null)
         {
@@ -68,6 +73,8 @@ public class AccountService : IAccountService
 
 
         AccountOutputDto account = BankAccountModelMapper.ToOutputDto(accountEntity);
+
+
 
         return account;
     }
@@ -142,7 +149,24 @@ public class AccountService : IAccountService
     {
         List<BankAccountModel> accounts = await this.accountRepository.GetAllAccountsAsync();
 
-        return BankAccountModelMapper.ToEntity(accounts);
+        return BankAccountModelMapper.ToEntityList(accounts);
+    }
+
+    public async Task<AccountOutputWithTransactionsDto> GetAccountWithTransactionsByNumberAsync(int accountNumber)
+    {
+        var accountModel = await this.accountRepository.GetAccountByNumberWithTransactionsAsync(accountNumber);
+        if (accountModel == null)
+        {
+            return null;
+        }
+
+
+        var account = BankAccountModelMapper.ToEntityWithTransactions(accountModel);
+
+
+        AccountOutputWithTransactionsDto accountDto = BankAccountModelMapper.ToOutputWithTransactionsDto(account);
+
+        return accountDto;
     }
 
     // public async Task TransferBetweenAccountsAsync(int sourceAccountNumber, int destinationAccountNumber, decimal amount)

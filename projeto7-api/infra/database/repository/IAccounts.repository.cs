@@ -13,5 +13,7 @@ namespace BankSystem.API.Repositories
         Task UpdateAccountAsync(BankAccountModel account);
         Task DeleteAccountAsync(BankAccountModel account);
         Task SaveDatabaseChangesAsync();
+
+        Task<BankAccountModel> GetAccountByNumberWithTransactionsAsync(int accountNumber);
     }
 }
