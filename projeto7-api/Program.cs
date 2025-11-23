@@ -57,6 +57,7 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 
 builder.Services.AddScoped<ITransferService, TransferService>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddAuthorization();
 

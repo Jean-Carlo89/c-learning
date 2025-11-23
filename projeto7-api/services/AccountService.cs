@@ -1,15 +1,18 @@
 using BankSystem.API.model;
 using BankSystem.API.Repositories;
+using BankSystem.Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 public class AccountService : IAccountService
 {
 
-    private readonly IAccountRepository repository;
-    public AccountService(IAccountRepository repository)
+    private readonly IAccountRepository accountRepository;
+    private readonly ITransactionRepository _transactionRepository;
+    public AccountService(IAccountRepository accountRepository, ITransactionRepository transactionRepository)
     {
 
-        this.repository = repository;
+        this.accountRepository = accountRepository;
+        this._transactionRepository = transactionRepository;
     }
 
 
@@ -25,13 +28,13 @@ public class AccountService : IAccountService
 
         BankAccountModel accountModel = BankAccountModelMapper.ToModel(newAccount);
 
-        await this.repository.AddNewAccountAsync(accountModel);
-        await this.repository.SaveDatabaseChangesAsync();
+        await this.accountRepository.AddNewAccountAsync(accountModel);
+        await this.accountRepository.SaveDatabaseChangesAsync();
     }
 
     public async Task<bool> checkIfAccountExistsByNumberAsync(int accountNumber)
     {
-        BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
+        BankAccountModel account = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
         if (account == null)
         {
             return false;
@@ -42,38 +45,19 @@ public class AccountService : IAccountService
 
     public async Task<bool> checkIfClientExistsByIdAsync(int clientId)
     {
-        return await this.repository.checkIfClientExistsByIdAsync(clientId);
+        return await this.accountRepository.checkIfClientExistsByIdAsync(clientId);
     }
 
 
 
-    public async Task depositInAccountAsync(int accountNumber, decimal amount)
-    {
 
-        BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
-
-        // if (account == null)
-        // {
-        //     return false;
-        // }
-        BankAccount accountEntity = BankAccountModelMapper.ToEntity(account);
-
-
-        accountEntity.Deposit(amount);
-
-
-        account.Balance = accountEntity.Balance;
-
-
-        await this.repository.SaveDatabaseChangesAsync();
-    }
 
 
 
 
     public async Task<AccountOutputDto> GetAccountByNumberAsync(int accountNumber)
     {
-        var accountModel = await this.repository.GetAccountByNumberAsync(accountNumber);
+        var accountModel = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
 
         if (accountModel == null)
         {
@@ -90,7 +74,7 @@ public class AccountService : IAccountService
 
     public async Task withdrawFromAccountAsync(int accountNumber, decimal amount)
     {
-        BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
+        BankAccountModel account = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
 
 
         BankAccount accountEntity = BankAccountModelMapper.ToEntity(account);
@@ -101,7 +85,44 @@ public class AccountService : IAccountService
 
         account.Balance = accountEntity.Balance;
 
-        await this.repository.SaveDatabaseChangesAsync();
+        var transaction = this.createTransaction(TransactionType.Withdrawal, amount, account.Id);
+
+        await _transactionRepository.AddTransactionAsync(transaction);
+
+        await this.accountRepository.SaveDatabaseChangesAsync();
+    }
+
+    public async Task depositInAccountAsync(int accountNumber, decimal amount)
+    {
+
+        BankAccountModel account = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
+
+
+        BankAccount accountEntity = BankAccountModelMapper.ToEntity(account);
+
+
+        accountEntity.Deposit(amount);
+
+
+        account.Balance = accountEntity.Balance;
+
+        var transaction = this.createTransaction(TransactionType.Deposit, amount, account.Id);
+
+        await _transactionRepository.AddTransactionAsync(transaction);
+
+        await this.accountRepository.SaveDatabaseChangesAsync();
+    }
+
+    private TransactionModel createTransaction(TransactionType type, decimal amount, int sourceAccountId)
+    {
+        return new TransactionModel
+        {
+            Type = type,
+            Amount = amount,
+            CreatedAt = DateTime.UtcNow,
+            SourceAccountId = sourceAccountId,
+            DestinationAccountId = sourceAccountId
+        };
     }
 
     public async Task deleteAccountAsync(int accountNumber)
@@ -110,16 +131,16 @@ public class AccountService : IAccountService
         //*****  Atualizar métodod de delete para fazer direto pelo Id da conta
 
 
-        BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
+        BankAccountModel account = await this.accountRepository.GetAccountByNumberAsync(accountNumber);
 
-        await this.repository.DeleteAccountAsync(account);
-        await this.repository.SaveDatabaseChangesAsync();
+        await this.accountRepository.DeleteAccountAsync(account);
+        await this.accountRepository.SaveDatabaseChangesAsync();
 
     }
 
     public async Task<List<BankAccount>> GetAllAccountsAsync()
     {
-        List<BankAccountModel> accounts = await this.repository.GetAllAccountsAsync();
+        List<BankAccountModel> accounts = await this.accountRepository.GetAllAccountsAsync();
 
         return BankAccountModelMapper.ToEntity(accounts);
     }

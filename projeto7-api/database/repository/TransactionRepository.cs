@@ -23,13 +23,12 @@ namespace BankSystem.API.Repositories
 
 
             return await _context.Transactions
-                .Where(t => t.SourceAccountId == accountId || t.DestinationAccountId == accountId)
+                .Where(t => t.SourceAccountId == accountId)
                 .Include(t => t.SourceAccount)
                 .Include(t => t.DestinationAccount)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
         }
-
 
     }
 }

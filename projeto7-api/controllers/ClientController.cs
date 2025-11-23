@@ -1,3 +1,4 @@
+using System.Net;
 using BankSystem.API.Dtos;
 using BankSystem.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -8,59 +9,56 @@ using Microsoft.Extensions.Logging;
 [Route("api/[controller]")]
 public class ClientController : ControllerBase
 {
-    private readonly IClientRepository repository;
-    public ClientController(IClientRepository repository)
+    private readonly IClientService service;
+    public ClientController(IClientService service)
     {
-        this.repository = repository;
+        this.service = service;
     }
-    // 
+
 
     [HttpPost]
 
     public async Task<IActionResult> CreateClient([FromBody] ClientInputDto ClientDto)
     {
 
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+
+            var createdClient = await service.AddNewClientAsync(ClientDto);
+
+            return Ok(createdClient);
+        }
+        catch (ArgumentException ex)
+        {
+            var errorDetails = new
+            {
+                Status = (int)HttpStatusCode.BadRequest,
+                Error = "ValidationFailed",
+                Messages = ex.Message.Split('\n')
+            };
+
+
+            return BadRequest(errorDetails);
+        }
+        catch (Exception)
+        {
+            return StatusCode((int)HttpStatusCode.InternalServerError, new { Error = "InternalServerError", Message = "Ocorreu um erro inesperado no servidor." });
         }
 
-        Client newClient = new Client(ClientDto.Nome, ClientDto.email);
-        ClientModel newClientModel = ClientModelMapper.ToModel(newClient);
-
-        //  await context.AddAsync(newClientModel);
-
-        await this.repository.AddNewClientAsync(newClientModel);
-        await this.repository.SaveDatabaseChangesAsync();
-
-        // await context.SaveChangesAsync();
-
-
-
-        return Ok();
 
     }
 
-    // Rota: GET api/Client/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<ClientOutputDto>> GetClient(int id)
     {
 
-        // var clientModel = await context.Clients.Include(c => c.Accounts).SingleOrDefaultAsync(c => c.Id == id);
-        var clientModel = await this.repository.GetClientByIdAsync(id);
 
-        if (clientModel == null)
-        {
-
-            return NotFound($"Cliente com Id {id} não encontrado.");
-        }
-
-
-        var clientEntity = ClientModelMapper.ToEntity(clientModel);
-
-
-        var clientDSto = ClientModelMapper.ToOutputDto(clientEntity);
-
+        var clientDSto = await service.GetClientByIdAsync(id);
 
         return Ok(clientDSto);
     }

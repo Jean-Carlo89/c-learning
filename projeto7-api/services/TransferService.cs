@@ -59,18 +59,27 @@ namespace BankSystem.API.Services
                 sourceAccountModel.Balance = sourceAccountEntity.Balance;
                 destinationAccountModel.Balance = destinationAccountEntity.Balance;
 
-
-
-                var transactionModel = new TransactionModel
+                var debitTransaction = new TransactionModel
                 {
-                    Type = TransactionType.Transfer,
+                    Type = TransactionType.TransferOut,
                     Amount = amount,
                     CreatedAt = DateTime.UtcNow,
                     SourceAccountId = sourceAccountModel.Id,
                     DestinationAccountId = destinationAccountModel.Id
                 };
 
-                await _transactionRepository.AddTransactionAsync(transactionModel);
+                var creditTransaction = new TransactionModel
+                {
+                    Type = TransactionType.TransferIn,
+                    Amount = amount,
+                    CreatedAt = DateTime.UtcNow,
+                    SourceAccountId = destinationAccountModel.Id,
+                    DestinationAccountId = sourceAccountModel.Id
+                };
+
+
+                await _transactionRepository.AddTransactionAsync(debitTransaction);
+                await _transactionRepository.AddTransactionAsync(creditTransaction);
 
 
                 await _context.SaveChangesAsync();

@@ -22,6 +22,24 @@ namespace BankSystem.API.Repositories
                                  .FirstOrDefaultAsync(c => c.Id == Id);
         }
 
+        public async Task<ClientModel> GetClientByCpfAsync(string cpf)
+        {
+
+            return await _context.Clients
+                                 .Include(c => c.Accounts)
+                                 .FirstOrDefaultAsync(c => c.Cpf == cpf);
+        }
+
+        public async Task<ClientModel> GetClientByEmailAsync(string email)
+        {
+
+            return await _context.Clients
+                                 .Include(c => c.Accounts)
+                                 .FirstOrDefaultAsync(c => c.Email == email);
+        }
+
+
+
 
 
         public async Task AddNewClientAsync(ClientModel client)
@@ -29,18 +47,7 @@ namespace BankSystem.API.Repositories
             await _context.Clients.AddAsync(client);
         }
 
-        // public Task UpdateAsync(BankAccountModel account)
-        // {
 
-        //     _context.Accounts.Update(account);
-        //     return Task.CompletedTask;
-        // }
-
-        // public Task DeleteAsync(BankAccountModel account)
-        // {
-        //     _context.Accounts.Remove(account);
-        //     return Task.CompletedTask;
-        // }
 
         public async Task SaveDatabaseChangesAsync()
         {

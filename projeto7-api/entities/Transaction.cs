@@ -8,7 +8,8 @@ namespace BankSystem.Domain.Entities
     {
         Deposit,
         Withdrawal,
-        Transfer
+        TransferOut,
+        TransferIn
     }
 
     public class Transaction
@@ -23,45 +24,23 @@ namespace BankSystem.Domain.Entities
         public int? DestinationAccountId { get; private set; }
 
 
-        public Transaction(TransactionType type, decimal value, int? targetAccountId)
+        public Transaction(TransactionType type, decimal value, int sourceAccountId, int? destinationAccountId = null)
         {
-            if (type == TransactionType.Transfer)
+            if (type == TransactionType.TransferOut && destinationAccountId == null)
             {
-                throw new ArgumentException("Cant be a transfer without both accounts. Use the other constructor.");
+                throw new ArgumentException("TransferOut requires DestinationAccountId.");
+            }
+            if (type == TransactionType.TransferIn && sourceAccountId == null)
+            {
+                throw new ArgumentException("TransferIn requires SourceAccountId.");
             }
 
             this.Type = type;
-            this.Value = value;
-            this.CreatedAt = DateTime.UtcNow;
-
-            if (type == TransactionType.Deposit)
-            {
-                this.DestinationAccountId = targetAccountId;
-                this.SourceAccountId = null;
-            }
-            else if (type == TransactionType.Withdrawal)
-            {
-                this.SourceAccountId = targetAccountId;
-                this.DestinationAccountId = null;
-            }
-        }
-
-
-        public Transaction(decimal value, int sourceAccountId, int destinationAccountId)
-        {
-            if (sourceAccountId == destinationAccountId)
-            {
-                throw new ArgumentException("The accounts cannot be the same for a transfer.");
-            }
-
-            this.Type = TransactionType.Transfer;
             this.Value = value;
             this.CreatedAt = DateTime.UtcNow;
             this.SourceAccountId = sourceAccountId;
             this.DestinationAccountId = destinationAccountId;
         }
 
-
-        private Transaction() { }
     }
 }

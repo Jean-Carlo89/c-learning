@@ -9,7 +9,7 @@ public class TransactionModel
     public TransactionType Type { get; set; }
     public string Description { get; set; } = "";
     public DateTime CreatedAt { get; set; }
-    public int SourceAccountId { get; set; }
+    public int? SourceAccountId { get; set; }
     public BankAccountModel SourceAccount { get; set; }
 
 

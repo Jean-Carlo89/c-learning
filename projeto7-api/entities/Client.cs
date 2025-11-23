@@ -18,12 +18,13 @@ public class Client
         this.DateOfBirth = DateOfBirth ?? DateTime.Now;
     }
 
-    public Client(string Name, string Email, DateTime? DateOfBirth = null)
+    public Client(string Name, string Email, string cpf, DateTime? DateOfBirth = null)
     {
         this.Id = Id;
         this.Name = Name;
         this.Email = Email;
         this.DateOfBirth = DateOfBirth ?? DateTime.Now;
+        this.Cpf = cpf;
     }
 
     public Client(int Id, string Name, string Email)

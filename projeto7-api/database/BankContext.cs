@@ -32,13 +32,13 @@ public class BankContext : DbContext
             entity.HasOne(c => c.Client)
                   .WithMany(a => a.Accounts)
                   .HasForeignKey(c => c.ClientId)
-                 .OnDelete(DeleteBehavior.Cascade);
+                 .OnDelete(DeleteBehavior.Restrict);
 
 
             entity.HasMany(a => a.Transactions)
                   .WithOne(t => t.SourceAccount)
                   .HasForeignKey(t => t.SourceAccountId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                  .OnDelete(DeleteBehavior.Restrict);
 
 
             entity.HasMany(a => a.DestinationTransactions)
@@ -70,11 +70,11 @@ public class BankContext : DbContext
         });
         modelBuilder.Entity<TransactionModel>(entity =>
                 {
-                    // Chave primária
+
                     entity.HasKey(t => t.Id);
                     entity.Property(t => t.Id).ValueGeneratedOnAdd();
 
-                    // Configurações das colunas
+
                     entity.Property(t => t.Amount)
                         .HasColumnType("decimal(18,2)")
                         .IsRequired();
@@ -90,7 +90,7 @@ public class BankContext : DbContext
                         .IsRequired();
 
                     entity.Property(t => t.SourceAccountId)
-                        .IsRequired();
+                        .IsRequired(false);
 
                     entity.Property(t => t.DestinationAccountId)
                         .IsRequired(false);
@@ -99,7 +99,7 @@ public class BankContext : DbContext
                     entity.HasOne(t => t.SourceAccount)
                         .WithMany(b => b.Transactions)
                         .HasForeignKey(t => t.SourceAccountId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
 
                     entity.HasOne(t => t.DestinationAccount)
