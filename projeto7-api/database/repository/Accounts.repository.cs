@@ -49,5 +49,17 @@ namespace BankSystem.API.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public Task<List<BankAccountModel>> GetAllAccountsAsync()
+        {
+
+            return this._context.Accounts.ToListAsync();
+        }
     }
 }
+
+// "JwtSettings": {
+//     "Key": "Sua-Chave-Super-Secreta-De-Pelo-Menos-32-Caracteres",
+//     "Issuer": "MinhaAPI",
+//     "Audience": "MinhaAPI"
+//   },

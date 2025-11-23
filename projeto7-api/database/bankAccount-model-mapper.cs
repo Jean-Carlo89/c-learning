@@ -25,6 +25,16 @@ public static class BankAccountModelMapper
         };
     }
 
+    public static List<BankAccountModel> ToModel(List<BankAccount> entities)
+    {
+        if (entities == null)
+        {
+            return null;
+        }
+
+        return entities.Select(ToModel).ToList();
+    }
+
 
     public static BankAccount ToEntity(BankAccountModel model)
     {
@@ -48,6 +58,29 @@ public static class BankAccountModelMapper
 
     }
 
+    public static List<BankAccount> ToEntity(List<BankAccountModel> models)
+    {
+
+        if (models == null)
+        {
+            return null;
+        }
+
+
+        return models
+            .Select(model => new BankAccount(
+                id: model.Id,
+                number: model.Number,
+                balance: model.Balance,
+                type: model.Type,
+                holder: model.Holder,
+                createdAt: model.CreatedAt,
+                status: model.Status,
+                clientId: model.ClientId
+            ))
+            .ToList();
+    }
+
     public static AccountOutputDto ToOutputDto(BankAccount entity)
     {
         if (entity == null)
@@ -65,5 +98,16 @@ public static class BankAccountModelMapper
 
             Tipo = entity.Type.ToString()
         };
+    }
+
+    public static List<AccountOutputDto> ToOutputDto(List<BankAccount> entities)
+    {
+        if (entities == null)
+        {
+            return null;
+        }
+
+
+        return entities.Select(ToOutputDto).ToList();
     }
 }

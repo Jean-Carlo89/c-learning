@@ -7,7 +7,7 @@ public class AccountInputDto
 
 
 
-    [Range(0, 1000000, ErrorMessage = "O saldo inicial deve ser positivo.")]
+    [Range(0, 1000000, ErrorMessage = "O saldo inicial deve ser positiv.")]
     public decimal Saldo { get; set; }
 
     [Required(ErrorMessage = "O nome do titular é obrigatório.")]

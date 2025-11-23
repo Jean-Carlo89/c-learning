@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Transactions;
 
 public class BankAccount
 {
@@ -14,6 +15,9 @@ public class BankAccount
     public AccountStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public int ClientId { get; private set; }
+
+    private readonly List<Transaction> _transactions = new List<Transaction>();
+    public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
 
 
     public BankAccount(int id, int number, decimal balance, AccountType type, string holder, DateTime createdAt, AccountStatus status, int clientId)
@@ -73,6 +77,12 @@ public class BankAccount
         if (amount <= 0)
         {
             throw new ArgumentException("O valor do saque deve ser positivo.");
+        }
+
+        if (amount > Balance)
+        {
+
+            throw new InvalidOperationException("Saldo insuficiente para realizar o saque.");
         }
 
         Balance -= amount;

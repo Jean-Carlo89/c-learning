@@ -7,12 +7,15 @@ public interface IAccountService
 
     Task AddNewAccountAsync(AccountInputDto account);
 
+    Task<List<BankAccount>> GetAllAccountsAsync();
+
     Task<bool> checkIfClientExistsByIdAsync(int clientId);
 
-    Task depositInAccount(int accountNumber, decimal amount);
-    Task withdrawFromAccount(int accountNumber, decimal amount);
+    Task depositInAccountAsync(int accountNumber, decimal amount);
+    Task withdrawFromAccountAsync(int accountNumber, decimal amount);
 
-    Task<bool> checkIfAccountExistsByNumber(int accountNumber);
+    Task<bool> checkIfAccountExistsByNumberAsync(int accountNumber);
 
-    Task deleteAccount(int accountNumber);
+    Task deleteAccountAsync(int accountNumber);
+    Task TransferBetweenAccountsAsync(int sourceAccountNumber, int destinationAccountNumber, decimal amount);
 }

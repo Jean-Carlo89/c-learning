@@ -7,6 +7,7 @@ namespace BankSystem.API.Repositories
     public interface IAccountRepository
     {
         Task<BankAccountModel> GetAccountByNumberAsync(int numero);
+        Task<List<BankAccountModel>> GetAllAccountsAsync();
         Task<bool> checkIfClientExistsByIdAsync(int clientId);
         Task AddNewAccountAsync(BankAccountModel account);
         Task UpdateAccountAsync(BankAccountModel account);

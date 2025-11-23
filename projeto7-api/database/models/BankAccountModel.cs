@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Transactions;
 
 namespace BankSystem.API.model;
 
@@ -20,6 +21,7 @@ public class BankAccountModel
         this.Holder = Holder;
         this.CreatedAt = DateTime.Now;
         this.Status = AccountStatus.Active;
+        Transactions = new List<TransactionModel>();
     }
 
     [Key]
@@ -54,6 +56,12 @@ public class BankAccountModel
 
     public int ClientId { get; set; }
     public ClientModel Client { get; set; }
+
+    public ICollection<TransactionModel> Transactions { get; set; }
+
+    public ICollection<TransactionModel> DestinationTransactions { get; set; }
+
+
 
 
 }

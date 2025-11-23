@@ -20,6 +20,7 @@ public static class ClientModelMapper
             Name = entity.Name,
             Email = entity.Email,
             DateOfBirth = entity.DateOfBirth,
+            Cpf = entity.Cpf,
             Accounts = entity.Accounts?
                          .Select(BankAccountModelMapper.ToModel)
                          .ToList()

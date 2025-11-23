@@ -34,4 +34,14 @@ public class Client
         this.Email = Email;
         // this.DateOfBirth = DateOfBirth;
     }
+
+    public Client(int id, string name, string cpf, string email, DateTime dateOfBirth, List<BankAccount> accounts)
+    {
+        this.Id = id;
+        this.Name = name;
+        this.Cpf = cpf;
+        this.Email = email;
+        this.DateOfBirth = dateOfBirth;
+        this.Accounts = accounts ?? new List<BankAccount>();
+    }
 }

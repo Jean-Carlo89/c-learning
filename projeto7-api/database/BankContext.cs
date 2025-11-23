@@ -11,6 +11,8 @@ public class BankContext : DbContext
 
     public DbSet<ClientModel> Clients { get; set; }
 
+    public DbSet<TransactionModel> Transactions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -31,6 +33,18 @@ public class BankContext : DbContext
                   .WithMany(a => a.Accounts)
                   .HasForeignKey(c => c.ClientId)
                  .OnDelete(DeleteBehavior.Cascade);
+
+
+            entity.HasMany(a => a.Transactions)
+                  .WithOne(t => t.SourceAccount)
+                  .HasForeignKey(t => t.SourceAccountId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+
+            entity.HasMany(a => a.DestinationTransactions)
+                  .WithOne(t => t.DestinationAccount)
+                  .HasForeignKey(t => t.DestinationAccountId)
+                  .OnDelete(DeleteBehavior.Restrict);
 
         });
 
@@ -54,10 +68,55 @@ public class BankContext : DbContext
 
             entity.Property(c => c.DateOfBirth).IsRequired();
         });
+        modelBuilder.Entity<TransactionModel>(entity =>
+                {
+                    // Chave primária
+                    entity.HasKey(t => t.Id);
+                    entity.Property(t => t.Id).ValueGeneratedOnAdd();
+
+                    // Configurações das colunas
+                    entity.Property(t => t.Amount)
+                        .HasColumnType("decimal(18,2)")
+                        .IsRequired();
+
+                    entity.Property(t => t.Type)
+                        .IsRequired();
+
+                    entity.Property(t => t.Description)
+                        .HasMaxLength(200)
+                        .IsRequired();
+
+                    entity.Property(t => t.CreatedAt)
+                        .IsRequired();
+
+                    entity.Property(t => t.SourceAccountId)
+                        .IsRequired();
+
+                    entity.Property(t => t.DestinationAccountId)
+                        .IsRequired(false);
 
 
+                    entity.HasOne(t => t.SourceAccount)
+                        .WithMany(b => b.Transactions)
+                        .HasForeignKey(t => t.SourceAccountId)
+                        .OnDelete(DeleteBehavior.Cascade);
 
+
+                    entity.HasOne(t => t.DestinationAccount)
+                        .WithMany(b => b.DestinationTransactions)
+                        .HasForeignKey(t => t.DestinationAccountId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+
+                    entity.HasIndex(t => t.SourceAccountId);
+                    entity.HasIndex(t => t.DestinationAccountId);
+                    entity.HasIndex(t => t.CreatedAt);
+                    entity.HasIndex(t => t.Type);
+                });
     }
+
+
 }
+
 
 

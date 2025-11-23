@@ -12,6 +12,8 @@ public class AccountService : IAccountService
         this.repository = repository;
     }
 
+
+
     public async Task AddNewAccountAsync(AccountInputDto accountDto)
     {
 
@@ -27,7 +29,7 @@ public class AccountService : IAccountService
         await this.repository.SaveDatabaseChangesAsync();
     }
 
-    public async Task<bool> checkIfAccountExistsByNumber(int accountNumber)
+    public async Task<bool> checkIfAccountExistsByNumberAsync(int accountNumber)
     {
         BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
         if (account == null)
@@ -45,7 +47,7 @@ public class AccountService : IAccountService
 
 
 
-    public async Task depositInAccount(int accountNumber, decimal amount)
+    public async Task depositInAccountAsync(int accountNumber, decimal amount)
     {
 
         BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
@@ -86,7 +88,7 @@ public class AccountService : IAccountService
         return account;
     }
 
-    public async Task withdrawFromAccount(int accountNumber, decimal amount)
+    public async Task withdrawFromAccountAsync(int accountNumber, decimal amount)
     {
         BankAccountModel account = await this.repository.GetAccountByNumberAsync(accountNumber);
 
@@ -102,7 +104,7 @@ public class AccountService : IAccountService
         await this.repository.SaveDatabaseChangesAsync();
     }
 
-    public async Task deleteAccount(int accountNumber)
+    public async Task deleteAccountAsync(int accountNumber)
     {
 
         //*****  Atualizar métodod de delete para fazer direto pelo Id da conta
@@ -114,5 +116,31 @@ public class AccountService : IAccountService
         await this.repository.SaveDatabaseChangesAsync();
 
     }
+
+    public async Task<List<BankAccount>> GetAllAccountsAsync()
+    {
+        List<BankAccountModel> accounts = await this.repository.GetAllAccountsAsync();
+
+        return BankAccountModelMapper.ToEntity(accounts);
+    }
+
+    public async Task TransferBetweenAccountsAsync(int sourceAccountNumber, int destinationAccountNumber, decimal amount)
+    {
+        BankAccountModel sourceAccountModel = await this.repository.GetAccountByNumberAsync(sourceAccountNumber);
+        BankAccountModel destinationAccountModel = await this.repository.GetAccountByNumberAsync(destinationAccountNumber);
+
+        BankAccount sourceAccountEntity = BankAccountModelMapper.ToEntity(sourceAccountModel);
+        BankAccount destinationAccountEntity = BankAccountModelMapper.ToEntity(destinationAccountModel);
+
+        sourceAccountEntity.Withdraw(amount);
+        destinationAccountEntity.Deposit(amount);
+
+        sourceAccountModel.Balance = sourceAccountEntity.Balance;
+        destinationAccountModel.Balance = destinationAccountEntity.Balance;
+
+        await this.repository.SaveDatabaseChangesAsync();
+    }
+
+
 }
 
