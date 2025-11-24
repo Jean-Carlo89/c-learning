@@ -3,5 +3,6 @@ public enum TransactionType
     Deposit,
     Withdrawal,
     TransferOut,
-    TransferIn
+    TransferIn,
+    Fee
 }

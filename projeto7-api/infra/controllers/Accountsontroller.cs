@@ -44,7 +44,7 @@ namespace projeto7_api.Controllers
             var claims = new[]
             {
             new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, "Cliente"), // Exemplo de Role
+            new Claim(ClaimTypes.Role, "Cliente"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

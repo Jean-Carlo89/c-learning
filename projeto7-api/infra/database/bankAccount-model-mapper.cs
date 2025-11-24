@@ -23,7 +23,7 @@ public static class BankAccountModelMapper
             Type = entity.Type,
             Status = entity.Status,
             ClientId = entity.ClientId,
-            Transactions = TransactionMapper.ToModelList(entity.Transactions.ToList()),
+            Transactions = TransactionMapper.ToModelList(entity.Transactions?.ToList()),
 
         };
     }
@@ -47,17 +47,52 @@ public static class BankAccountModelMapper
         }
 
 
-        return new BankAccount(
-            id: model.Id,
-            number: model.Number,
-            balance: model.Balance,
-            type: model.Type,
-            holder: model.Holder,
-            createdAt: model.CreatedAt,
-            status: model.Status,
-            clientId: model.ClientId
-        // transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
-        );
+
+        switch (model.Type)
+        {
+            case AccountType.Corrente:
+                return new CheckingAccount(
+                    id: model.Id,
+                    number: model.Number,
+                    balance: model.Balance,
+                    type: model.Type,
+                    holder: model.Holder,
+                    createdAt: model.CreatedAt,
+                    status: model.Status,
+                    clientId: model.ClientId,
+                    transactions: TransactionMapper.ToEntityList(model.Transactions?.ToList())
+                );
+
+            case AccountType.Poupança:
+                return new SavingsAccount(
+                    id: model.Id,
+                    number: model.Number,
+                    balance: model.Balance,
+                    type: model.Type,
+                    holder: model.Holder,
+                    createdAt: model.CreatedAt,
+                    status: model.Status,
+                    clientId: model.ClientId,
+                transactions: TransactionMapper.ToEntityList(model.Transactions?.ToList())
+                );
+
+            default:
+
+                throw new NotSupportedException($"Account type '{model.Type}' is not supported for mapping.");
+        }
+
+
+        // return new BankAccount(
+        //     id: model.Id,
+        //     number: model.Number,
+        //     balance: model.Balance,
+        //     type: model.Type,
+        //     holder: model.Holder,
+        //     createdAt: model.CreatedAt,
+        //     status: model.Status,
+        //     clientId: model.ClientId
+        // // transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
+        // );
 
 
     }
@@ -70,17 +105,19 @@ public static class BankAccountModelMapper
             return null;
         }
 
-        var mappedAccount = new BankAccount(
-                    id: model.Id,
-                    number: model.Number,
-                    balance: model.Balance,
-                    type: model.Type,
-                    holder: model.Holder,
-                    createdAt: model.CreatedAt,
-                    status: model.Status,
-                    clientId: model.ClientId,
-                    transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
-                );
+
+        var mappedAccount = ToEntity(model);
+        // var mappedAccount = new BankAccount(
+        //             id: model.Id,
+        //             number: model.Number,
+        //             balance: model.Balance,
+        //             type: model.Type,
+        //             holder: model.Holder,
+        //             createdAt: model.CreatedAt,
+        //             status: model.Status,
+        //             clientId: model.ClientId,
+        //             transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
+        //         );
         return mappedAccount;
 
 
@@ -94,20 +131,15 @@ public static class BankAccountModelMapper
             return null;
         }
 
+        var mappedList = models
 
-        return models
-            .Select(model => new BankAccount(
-                id: model.Id,
-                number: model.Number,
-                balance: model.Balance,
-                type: model.Type,
-                holder: model.Holder,
-                createdAt: model.CreatedAt,
-                status: model.Status,
-                clientId: model.ClientId
-            // , transactions: TransactionMapper.ToEntityList(model.Transactions.ToList())
-            ))
-            .ToList();
+                .Select(model => ToEntity(model))
+                .ToList();
+
+        return mappedList;
+
+
+
     }
 
     public static AccountOutputDto ToOutputDto(BankAccount entity)
@@ -153,7 +185,7 @@ public static class BankAccountModelMapper
         return new AccountOutputWithTransactionsDto
         {
             DetalhesDaConta = ToOutputDto(entity),
-            Transacoes = TransactionMapper.ToOutputDtoList(entity.Transactions.ToList())
+            Transacoes = TransactionMapper.ToOutputDtoList(entity.Transactions?.ToList())
         };
     }
 }
