@@ -15,7 +15,7 @@ namespace BankSystem.API.Services
         private readonly BankContext _context;
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
-
+        private const decimal TransferFeeRate = 0.005m;
 
         public TransferService(
             BankContext context,
@@ -35,7 +35,12 @@ namespace BankSystem.API.Services
             try
             {
 
+                decimal feeAmount = amount * TransferFeeRate;
+
+                decimal totalDebitAmount = amount + feeAmount;
+
                 BankAccountModel? sourceAccountModel = await _accountRepository.GetAccountByNumberAsync(sourceAccountNumber);
+
                 BankAccountModel? destinationAccountModel = await _accountRepository.GetAccountByNumberAsync(destinationAccountNumber);
 
                 if (sourceAccountModel == null)
@@ -52,7 +57,9 @@ namespace BankSystem.API.Services
                 BankAccount sourceAccountEntity = BankAccountModelMapper.ToEntity(sourceAccountModel);
                 BankAccount destinationAccountEntity = BankAccountModelMapper.ToEntity(destinationAccountModel);
 
-                sourceAccountEntity.Withdraw(amount);
+                sourceAccountEntity.Withdraw(totalDebitAmount);
+
+
                 destinationAccountEntity.Deposit(amount);
 
 
@@ -77,10 +84,19 @@ namespace BankSystem.API.Services
                     DestinationAccountId = sourceAccountModel.Id
                 };
 
+                var feeTransaction = new TransactionModel
+                {
+                    Type = TransactionType.Fee,
+                    Amount = feeAmount,
+                    CreatedAt = DateTime.UtcNow,
+                    SourceAccountId = sourceAccountModel.Id,
+                    DestinationAccountId = null
+                };
+
 
                 await _transactionRepository.AddTransactionAsync(debitTransaction);
                 await _transactionRepository.AddTransactionAsync(creditTransaction);
-
+                await _transactionRepository.AddTransactionAsync(feeTransaction);
 
                 await _context.SaveChangesAsync();
 

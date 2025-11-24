@@ -15,7 +15,23 @@ public class AccountService : IAccountService
         this._transactionRepository = transactionRepository;
     }
 
-
+    private BankAccount createAccountByType(AccountInputDto accountDto, int randomNumber, int clientId)
+    {
+        if (accountDto.Tipo == AccountType.Corrente)
+        {
+            return new CheckingAccount(accountDto, randomNumber,
+                                       clientId);
+        }
+        else if (accountDto.Tipo == AccountType.Poupança)
+        {
+            return new SavingsAccount(accountDto, randomNumber,
+                                       clientId);
+        }
+        else
+        {
+            throw new ArgumentException("Tipo de conta inválido.");
+        }
+    }
 
     public async Task AddNewAccountAsync(AccountInputDto accountDto)
     {
@@ -24,7 +40,9 @@ public class AccountService : IAccountService
         int maxExclusive = 10000000;
         int randomNumber = random.Next(0, maxExclusive);
 
-        BankAccount newAccount = new BankAccount(accountDto, randomNumber, accountDto.ClientId);
+
+
+        BankAccount newAccount = createAccountByType(accountDto, randomNumber, accountDto.ClientId);
 
         BankAccountModel accountModel = BankAccountModelMapper.ToModel(newAccount);
 
